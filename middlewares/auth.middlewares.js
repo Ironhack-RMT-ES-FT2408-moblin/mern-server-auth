@@ -21,4 +21,17 @@ function verifyToken(req, res, next) {
   }
 }
 
-module.exports = verifyToken
+function verifyAdmin(req, res, next) {
+
+  if (req.payload.role === "admin") {
+    next() // continua con la ruta de admin
+  } else {
+    res.status(401).json({message: "no eres admin, fuera de aqui"})
+  }
+
+}
+
+module.exports = {
+  verifyToken,
+  verifyAdmin
+}

@@ -4,7 +4,7 @@ const User = require("../models/User.model");
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 
-const verifyToken = require("../middlewares/auth.middlewares")
+const {verifyToken, verifyAdmin} = require("../middlewares/auth.middlewares")
 
 // POST "/api/auth/signup" => recibe credenciales de usuario y lo crea en la DB
 router.post("/signup", async (req, res, next) => {
@@ -86,7 +86,8 @@ router.post("/login", async (req, res, next) => {
     // ya hemos autenticado al usuario => enviarle su llave virtual
     const payload = {
       _id: foundUser._id,
-      email: foundUser.email
+      email: foundUser.email,
+      role: foundUser.role
       // cualquier propiedad que identifique al usuario o le de poder especiales debe estar acá
     }
 
@@ -111,6 +112,26 @@ router.get("/verify", verifyToken, (req, res) => {
 
   res.status(200).json(req.payload)
   //! con esto el frontend sabe quien es el usuario que está navegando por la web
+
+})
+
+
+
+// ejemplo de una llamada privada como /user/mi-perfil
+router.get("/user/perfil", verifyToken, (req, res) => {
+
+  // todas las llamadas que sean privada DEBERAN tener el verifyToken
+
+  res.json({message: "aqui tienes tu información privada"})
+
+})
+
+// ejemplo de una llamada privada y de admin como /user/mi-perfil
+router.get("/user/admin", verifyToken, verifyAdmin, (req, res) => {
+
+  // todas las llamadas que sean privada DEBERAN tener el verifyToken
+
+  res.json({message: "esta es tu data de admin"})
 
 })
 
